@@ -2,33 +2,38 @@
 - hosts: all
   become: true
   pre_tasks:
-    - name: install updates for Fedora
-      ansible.builtin.dnf:
-        update_only: yes
-        update_cache: yes
-      when: ansible_distribution == "Fedora"
 
-    - name: install updates for Ubuntu
-      ansible.builtin.apt:
-        upgrade: dist
-        update_cache: yes
-      when: ansible_distribution == "Ubuntu"
+  - name: install updates for Fedora
+    tags: always
+    ansible.builtin.dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Fedora"
+
+  - name: install updates for Ubuntu
+    tags: always
+    ansible.builtin.apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
 
 - hosts: web_serveurs
   become: true
   tasks:
-    - name: install Apache on web servers
-      ansible.builtin.apt:
-        name:
-          - apache2
-          - libapache2-mod-php
-      when: ansible_distribution == "Ubuntu"
+  - name: install Apache on web servers
+    tags: apacha,ubuntu
+    ansible.builtin.apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+    when: ansible_distribution == "Ubuntu"
 
 - hosts: db_servers
   become: true
   tasks:
-    - name: install MariaDB on Fedora
-      ansible.builtin.dnf:
-        name: mariadb
-        state: latest
-      when: ansible_distribution == "Fedora"
+  - name: install MariaDB on Fedora
+    tags: db,fedora
+    ansible.builtin.dnf:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "Fedora"
