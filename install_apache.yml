@@ -4,20 +4,11 @@
   tasks:
 
   - name: install apache2 package              # Nom afficher lors de l'execution de la task
-    ansible.builtin.apt:                       # Utiliser le built-in package manager 
+    ansible.builtin.package:                       # Utiliser le built-in package manager 
       name: 
-      - apache2 
-      - libapache2-mod-php                     
+      - "{{ apache_package }}"   
+      - "{{ php_package }}"                      
       state: latest                            # Permet d'avoir la dernier version
-      update_cache: yes   
-    when: ansible_distribution == "Ubuntu"     # Conditional
+      update_cache: yes      # Conditional
 
-  - name: install support for php and httpd
-    ansible.builtin.dnf:              
-      name: 
-      - httpd   
-      - php
-      state: latest
-      update_cache: yes   
-    when: ansible_distribution == "Fedora"
-
+ 
