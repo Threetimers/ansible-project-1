@@ -6,13 +6,16 @@
   - name: update repository index
     ansible.builtin.apt:
       update_cache: yes
+    when: ansible_distribution == "Ubuntu"
 
-  - name: install apache2 package     # Nom afficher lors de l'execution de la task
-    ansible.builtin.apt:              # Utiliser le built-in package manager 
-      name: apache2                   # argument to apt package
-    state: latest                    # Permet d'avoir la dernier version
-  
+  - name: install apache2 package              # Nom afficher lors de l'execution de la task
+    ansible.builtin.apt:                       # Utiliser le built-in package manager 
+      name: apache2                            # argument to apt package
+      state: latest                            # Permet d'avoir la dernier version
+    when: ansible_distribution == "Ubuntu"     # Conditional
+
   - name: install support for php
     ansible.builtin.apt:              
       name: libapache2-mod-php     
-       state: latest
+      state: latest
+    when: ansible_distribution == "Ubuntu"
