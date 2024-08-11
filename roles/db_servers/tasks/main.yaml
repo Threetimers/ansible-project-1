@@ -1,0 +1,6 @@
+- name: install MariaDB on Fedora
+  ansible.builtin.dnf:
+    name: mariadb
+    state: latest
+  when: ansible_distribution == "Fedora"
+
