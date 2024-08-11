@@ -1,0 +1,87 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: install updates for Fedora
+      tags: always
+      ansible.builtin.dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "Fedora"
+
+    - name: install updates for Ubuntu
+      tags: always
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+  tasks:
+    - name: install Apache on web servers (Ubuntu)
+      tags: apache, ubuntu
+      ansible.builtin.apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install Apache on web servers (Fedora)
+      tags: apache, fedora
+      ansible.builtin.dnf:
+        name:
+          - httpd
+      when: ansible_distribution == "Fedora"
+
+    - name: ensure Apache is running (Ubuntu)
+      tags: apache, ubuntu
+      ansible.builtin.service:
+        name: apache2
+        state: started
+      when: ansible_distribution == "Ubuntu"
+
+    - name: ensure Apache is running (Fedora)
+      tags: apache, fedora
+      ansible.builtin.service:
+        name: httpd
+        state: started
+      when: ansible_distribution == "Fedora"
+    
+    - name: change email address for admin (Fedora)
+      tags: apache, fedora
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "ServerAdmin"
+        line: ServerAdmin somebody.net
+      when: ansible_distribution == "Fedora"
+      register: httpd
+
+
+    - name: restart httpd(Fedora)
+      tags: apache, fedora
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      when: httpd.changed
+
+    
+    - name: copy HTML file for site (Ubuntu)
+      tags: apache, ubuntu
+      ansible.builtin.copy:
+        src: /home/johnwood/ansible-project-1/files/default_site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: db_servers
+  become: true
+  tasks:
+    - name: install MariaDB on Fedora
+      tags: db, fedora
+      ansible.builtin.dnf:
+        name: mariadb
+        state: latest
+      when: ansible_distribution == "Fedora"

@@ -1,5 +1,6 @@
-[web_serveurs]
+[web_servers]
 192.168.2.90
+192.168.2.91   
 
 [db_servers]
 192.168.2.91   
