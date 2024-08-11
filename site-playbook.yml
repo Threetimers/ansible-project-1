@@ -15,7 +15,28 @@
         upgrade: dist
         update_cache: yes
       when: ansible_distribution == "Ubuntu"
+    
+    - name: add sudoers file for simone
+      tags: always
+      ansible.builtin.copy:
+        src: sudoers_simone
+        dest: /etc/sudoers.d/simone
+        owner: root
+        group: root
+        mode: 0440
+    
+    - name: add ssh key
+      tags: always
+      ansible.builtin.authorized_key:
+        user: simone
+        key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDVpvVEL5y19WgyDYET+tJw7Gr5aLf8fF1S65XigzvqWupZvItAjjq/JTjCHMdCQf3FG2bf+RiDqq/S8CYk/Xall8v9e7nyS6pF9zBYfY4r34O394WWiowd7+JMkWiU7VfcloLaVvtyqs6fnnlb5NpWljQ+aAGkQW0xtmrvOzvUPSeQuQZyTHr0D32rgUpAFNFbYDkWiBSCDfEEdCA7fgA8VvenpmBZJUzIJwJ7vc+ZoDiSyN1/x1jGKRicoMWijbQXEETxD/69Q3oLB5jgquQ+i+X4doI5IYtmi+1YN27Ux9oUmQGEFSWNiVVfH6JSVS7edG48fGi4NoiUiWInYrsd4k3Qcx79CwQayeGNKnUE7TlxeWgKDxk1LZelFAfe+S9oV6xBN9vr5e2K9e3cwSg5eFB4LJEidftT6Oz1SfmV6oXWRs2LV5COhp0WB5aSeb/xKgObDVS+QXPLPwdX339GAwpmW2PGkmaT1r8m5XvbsaS26CJy1aHaJrxhk1K3v32rnj+b0Zt+C0NRwDvbGmNM0sPwhWaJSsjcYhi3h+MiAz5eodtoCKQ6kxbFEuXJXkPBLVE1G/4U9gOKVsGDLGd3ZrRnlS6RgprA5sLqTsI9IaPcLcQgCBRFgsxBsicKw6eWmkHPKu+JdvBBiOqV5R3klyDFvrUepyph50LlUAAQJQ== your_email@example.com"
 
+    - name: add sudoers file for simone
+      tags: always
+      ansible.builtin.user:
+        name: simone
+        groups: root
+      
 - hosts: web_servers
   become: true
   tasks:
@@ -52,7 +73,7 @@
       tags: apache, fedora
       ansible.builtin.lineinfile:
         path: /etc/httpd/conf/httpd.conf
-        regexp: "ServerAdmin"
+        regexp: "^ServerAdmin"
         line: ServerAdmin somebody.net
       when: ansible_distribution == "Fedora"
       register: httpd
